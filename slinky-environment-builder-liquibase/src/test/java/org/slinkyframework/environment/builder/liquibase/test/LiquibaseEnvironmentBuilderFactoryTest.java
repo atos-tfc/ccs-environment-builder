@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.slinkyframework.environment.builder.EnvironmentBuilder;
 import org.slinkyframework.environment.builder.EnvironmentBuilderContext;
 import org.slinkyframework.environment.builder.liquibase.LiquibaseEnvironmentBuilderFactory;
+import org.slinkyframework.environment.builder.liquibase.docker.DockerLiquibaseEnvironmentBuilder;
 import org.slinkyframework.environment.builder.liquibase.local.LocalLiquibaseEnvironmentBuilder;
 
 import static org.hamcrest.Matchers.instanceOf;
@@ -34,13 +35,13 @@ public class LiquibaseEnvironmentBuilderFactoryTest {
         assertThat("LiquibaseEnvironmentBuilder", environmentBuilder, is(instanceOf(LocalLiquibaseEnvironmentBuilder.class)));
     }
 
-    @Test(expected = NotImplementedException.class)
+    @Test
     public void shouldGetEnvironmentBuilderToBuildInDocker() {
         boolean useDocker = true;
         EnvironmentBuilderContext context = new EnvironmentBuilderContext(TEST_HOST, useDocker);
 
         EnvironmentBuilder environmentBuilder = testee.getInstance(context);
 
-//        assertThat("CouchbaseEnvironmentBuilder", environmentBuilder, is(instanceOf(DockerCouchbaseEnvironmentBuilder.class)));
+        assertThat("DockerLiquibaseEnvironmentBuilder", environmentBuilder, is(instanceOf(DockerLiquibaseEnvironmentBuilder.class)));
     }
 }
