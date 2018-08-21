@@ -1,4 +1,4 @@
-package org.slinkyframework.environment.builder.couchbase.matchers;
+package org.slinkyframework.environment.docker.test.matchers;
 
 import org.apache.commons.compress.utils.IOUtils;
 import org.hamcrest.Description;
@@ -12,6 +12,8 @@ import org.springframework.retry.support.RetryTemplate;
 
 import java.io.IOException;
 import java.net.Socket;
+
+import static java.lang.String.format;
 
 public class HasPortAvailableMatcher extends TypeSafeMatcher<String> {
 
@@ -60,9 +62,13 @@ public class HasPortAvailableMatcher extends TypeSafeMatcher<String> {
             return true;
         } catch (IOException e) {
             LOG.debug("{}:{} is not in use", host, port);
-            throw new EnvironmentBuilderException("Couchbase container has failed to start", e);
+            throw new EnvironmentBuilderException(format("Container not available at %s:%s", host, port), e);
         } finally {
             IOUtils.closeQuietly(s);
         }
+    }
+
+    public static HasPortAvailableMatcher hasPortAvailable(int port) {
+        return new HasPortAvailableMatcher(port);
     }
 }

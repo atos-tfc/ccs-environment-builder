@@ -8,13 +8,22 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>slinky-environment-builder-couchbase</artifactId>
+    <artifactId>slinky-common-docker</artifactId>
 
     <dependencies>
         <dependency>
-            <groupId>org.slinkyframework.environment</groupId>
-            <artifactId>slinky-common-docker</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <groupId>com.spotify</groupId>
+            <artifactId>docker-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.bundles.repackaged</groupId>
+            <artifactId>jersey-guava</artifactId>
+            <version>2.25.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
+            <version>${jersey.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slinkyframework.environment</groupId>
@@ -22,16 +31,8 @@
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-couchbase</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slinkyframework.environment</groupId>
-            <artifactId>slinky-common-docker</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-            <type>test-jar</type>
-            <scope>test</scope>
+            <groupId>org.springframework.retry</groupId>
+            <artifactId>spring-retry</artifactId>
         </dependency>
     </dependencies>
 
@@ -66,6 +67,18 @@
                             <!-- of the BranchRepository. It is null when run in parallel when there is more than one test. -->
                             <parallel>none</parallel>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven-jar-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

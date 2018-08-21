@@ -57,6 +57,7 @@
     </distributionManagement>
 
     <modules>
+        <module>slinky-common-docker</module>
         <module>slinky-environment-builder</module>
         <module>slinky-environment-builder-couchbase</module>
         <module>slinky-environment-builder-liquibase</module>

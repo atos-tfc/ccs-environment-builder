@@ -175,21 +175,12 @@ public class CouchbaseSetUp {
     }
 
     private void waitFor(BiConsumer<Bucket, CouchbaseBuildDefinition> function, Bucket bucket, CouchbaseBuildDefinition buildDefinition) {
-        TimeoutRetryPolicy retryPolicy = new TimeoutRetryPolicy();
-        retryPolicy.setTimeout(THIRTY_SECONDS);
-
-        FixedBackOffPolicy backOffPolicy = new FixedBackOffPolicy();
-        backOffPolicy.setBackOffPeriod(ONE_SECOND);
-
-        RetryTemplate retryTemplate = new RetryTemplate();
-        retryTemplate.setRetryPolicy(retryPolicy);
-        retryTemplate.setThrowLastExceptionOnExhausted(true);
-        retryTemplate.setBackOffPolicy(backOffPolicy);
+        RetryTemplate retryTemplate = createRetryTemplate();
 
         retryTemplate.execute(rc -> { function.accept(bucket, buildDefinition); return null; });
     }
 
-    private void waitFor(BiConsumer<String, CouchbaseBuildDefinition> function, String host, CouchbaseBuildDefinition buildDefinition) {
+    private RetryTemplate createRetryTemplate() {
         TimeoutRetryPolicy retryPolicy = new TimeoutRetryPolicy();
         retryPolicy.setTimeout(THIRTY_SECONDS);
 
@@ -200,6 +191,12 @@ public class CouchbaseSetUp {
         retryTemplate.setRetryPolicy(retryPolicy);
         retryTemplate.setThrowLastExceptionOnExhausted(true);
         retryTemplate.setBackOffPolicy(backOffPolicy);
+
+        return retryTemplate;
+    }
+
+    private void waitFor(BiConsumer<String, CouchbaseBuildDefinition> function, String host, CouchbaseBuildDefinition buildDefinition) {
+        RetryTemplate retryTemplate = createRetryTemplate();
 
         retryTemplate.execute(rc -> { function.accept(host, buildDefinition); return null; });
     }
