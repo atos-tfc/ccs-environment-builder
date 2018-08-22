@@ -128,7 +128,7 @@ public class DockerDriver {
 
         if (existingContainer.isPresent()) {
             killAndRemoveContainer(existingContainer.get());
-            LOG.info("Couchbase docker container '{}' killed and removed", containerName);
+            LOG.info("Docker container '{}' killed and removed", containerName);
         } else {
             LOG.warn("Container '{}' was not running", containerName);
         }

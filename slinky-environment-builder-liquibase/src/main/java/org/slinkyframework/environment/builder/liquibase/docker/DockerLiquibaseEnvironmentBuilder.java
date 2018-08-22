@@ -39,12 +39,6 @@ public class DockerLiquibaseEnvironmentBuilder implements EnvironmentBuilder<Liq
     public void setUp(Set<LiquibaseBuildDefinition> buildDefinitions) {
         dockerDriver.setUpDocker();
 
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            throw new EnvironmentBuilderException("Exception waiting for Oracle XE container to start", e);
-        }
-
         localEnvironmentBuilder.setUp(buildDefinitions);
     }
 

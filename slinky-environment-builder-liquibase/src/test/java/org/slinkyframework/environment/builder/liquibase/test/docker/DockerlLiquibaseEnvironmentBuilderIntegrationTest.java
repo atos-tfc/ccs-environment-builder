@@ -54,17 +54,12 @@ public class DockerlLiquibaseEnvironmentBuilderIntegrationTest {
         testee = new DockerLiquibaseEnvironmentBuilder(new LocalLiquibaseEnvironmentBuilder(TEST_HOST));
 
         dockerDriver = new DockerDriver(CONTAINER_NAME, IMAGE_NAME, PORTS);
-//        dockerDriver.setUpDocker();
-//
-//        Thread.sleep(10000);
-//
+
         databaseProperties = new OracleProperties(TEST_USERNAME, TEST_PASSWORD, TEST_PORT, TEST_SID, TEST_USER1);
         LiquibaseBuildDefinition liquibaseBuildDefinition = new LiquibaseBuildDefinition(TEST_NAME, databaseProperties, TEST_CHANGE_LOG);
 
         buildDefinitions = new TreeSet<>();
         buildDefinitions.add(liquibaseBuildDefinition);
-
-//        databaseDriver = DatabaseDriverFactory.getInstance(databaseProperties);
 
         // Make sure no Docker containers left lying around
         testee.tearDown(buildDefinitions);

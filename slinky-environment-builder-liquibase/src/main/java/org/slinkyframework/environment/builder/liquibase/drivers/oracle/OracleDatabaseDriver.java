@@ -7,6 +7,9 @@ import org.slinkyframework.environment.builder.liquibase.drivers.DatabaseDriver;
 import org.slinkyframework.environment.builder.liquibase.drivers.UserDoesNotExistException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.retry.backoff.FixedBackOffPolicy;
+import org.springframework.retry.policy.TimeoutRetryPolicy;
+import org.springframework.retry.support.RetryTemplate;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -18,6 +21,9 @@ import static java.lang.String.format;
 public class OracleDatabaseDriver implements DatabaseDriver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OracleDatabaseDriver.class);
+
+    private static final int ONE_SECOND = 1000;
+    private static final long THIRTY_SECONDS = 30000;
 
     private OracleProperties properties;
     private Connection connection;
@@ -37,15 +43,30 @@ public class OracleDatabaseDriver implements DatabaseDriver {
             dataSource.setUser(properties.getUsername());
             dataSource.setPassword(properties.getPassword());
 
-            LOGGER.debug("Connecting to database '{}'", dataSource.getURL());
-
-            connection = dataSource.getConnection();
+            waitForConnection(dataSource);
 
             jdbcTemplate = new JdbcTemplate(dataSource);
             jdbcTemplate.setExceptionTranslator(new OracleSQLExceptionTranslator());
         }
 
         return connection;
+    }
+
+    private void waitForConnection(OracleDataSource dataSource) throws SQLException {
+        LOGGER.debug("Connecting to database '{}'", dataSource.getURL());
+
+        TimeoutRetryPolicy retryPolicy = new TimeoutRetryPolicy();
+        retryPolicy.setTimeout(THIRTY_SECONDS);
+
+        FixedBackOffPolicy backOffPolicy = new FixedBackOffPolicy();
+        backOffPolicy.setBackOffPeriod(ONE_SECOND);
+
+        RetryTemplate retryTemplate = new RetryTemplate();
+        retryTemplate.setRetryPolicy(retryPolicy);
+        retryTemplate.setThrowLastExceptionOnExhausted(true);
+        retryTemplate.setBackOffPolicy(backOffPolicy);
+
+        retryTemplate.execute(rc -> connection = dataSource.getConnection());
     }
 
     @Override
