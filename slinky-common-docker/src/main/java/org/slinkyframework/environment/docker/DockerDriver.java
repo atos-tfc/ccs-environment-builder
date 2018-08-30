@@ -21,8 +21,8 @@ import java.util.function.BiConsumer;
 import static java.lang.String.format;
 
 public class DockerDriver {
-    private static final String ENVIRONMENT_DOCKER_HOST = "DOCKER_HOST";
     private static final String ENVIRONMENT_DOCKER_MACHINE_NAME = "DOCKER_MACHINE_NAME";
+    private static final String DEFAULT_DOCKER_HOSTNAME = "localhost";
 
     private static final Logger LOG = LoggerFactory.getLogger(DockerDriver.class);
 
@@ -31,29 +31,24 @@ public class DockerDriver {
 
     private final String containerName;
     private final String imageName;
-    private final int[] ports;
-    private final String dockerHostname;
+    // Map of internal Docker ports to external ports
+    private final Map<Integer, Integer> ports;
+    private String dockerHostname;
 
     private DockerClient dockerClient;
     private String containerId;
 
-    public DockerDriver(String containerName, String imageName, int[] ports) {
+    public DockerDriver(String containerName, String imageName, Map<Integer, Integer> ports) {
         this.containerName = containerName;
         this.imageName = imageName;
         this.ports = ports;
 
-        verifyEnvironmentConfigured();
-
         dockerHostname = System.getenv(ENVIRONMENT_DOCKER_MACHINE_NAME);
 
-        connectToDocker();
-    }
-
-    private void verifyEnvironmentConfigured() {
-        if (!isEnvironmentVariableSet(ENVIRONMENT_DOCKER_HOST)
-                || !isEnvironmentVariableSet(ENVIRONMENT_DOCKER_MACHINE_NAME)) {
-            throw new EnvironmentBuilderException("Docker environment variables not set e.g. DOCKER_HOST. If using docker-machine run 'eval \"$(docker-machine env dev)\"' where 'dev' is your docker-machine host.");
+        if (dockerHostname == null) {
+            dockerHostname = DEFAULT_DOCKER_HOSTNAME;
         }
+        connectToDocker();
     }
 
     private boolean isEnvironmentVariableSet(String name) {
@@ -152,10 +147,10 @@ public class DockerDriver {
         LOG.debug("Creating Docker container '{}'", containerName);
 
         final Map<String, List<PortBinding>> portBindings = new HashMap<>();
-        for (int port : ports) {
+        for (int dockerPort : ports.keySet()) {
             List<PortBinding> hostPorts = new ArrayList<>();
-            hostPorts.add(PortBinding.of("0.0.0.0", port));
-            portBindings.put(port + "/tcp", hostPorts);
+            hostPorts.add(PortBinding.of("0.0.0.0", ports.get(dockerPort)));
+            portBindings.put(dockerPort + "/tcp", hostPorts);
         }
 
         HostConfig hostConfig = HostConfig.builder()
@@ -204,7 +199,11 @@ public class DockerDriver {
         retryTemplate.setThrowLastExceptionOnExhausted(true);
         retryTemplate.setBackOffPolicy(backOffPolicy);
 
-        retryTemplate.execute(rc -> portInUse(dockerHostname, ports[0]));
+        retryTemplate.execute(rc -> portInUse(dockerHostname, firstExternalPort()));
+    }
+
+    private Integer firstExternalPort() {
+        return ports.values().toArray(new Integer[] {})[0];
     }
 
     private boolean portInUse(String host, int port) {

@@ -1,13 +1,12 @@
 package org.slinkyframework.environment.builder.liquibase.docker;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slinkyframework.environment.builder.EnvironmentBuilder;
-import org.slinkyframework.environment.builder.EnvironmentBuilderException;
 import org.slinkyframework.environment.builder.liquibase.LiquibaseBuildDefinition;
 import org.slinkyframework.environment.builder.liquibase.local.LocalLiquibaseEnvironmentBuilder;
 import org.slinkyframework.environment.docker.DockerDriver;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -20,19 +19,23 @@ import java.util.Set;
  */
 public class DockerLiquibaseEnvironmentBuilder implements EnvironmentBuilder<LiquibaseBuildDefinition>  {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DockerLiquibaseEnvironmentBuilder.class);
-
     public static final String CONTAINER_NAME = "oracle-xe";
     public static final String ORACLE_XE_LATEST_IMAGE_NAME = "alexeiled/docker-oracle-xe-11g";
-    public  static final int[] ORACLE_XE_PORTS = { 1521 };
 
     private final LocalLiquibaseEnvironmentBuilder localEnvironmentBuilder;
+    private final Map<Integer, Integer> internalToExternalPortsMap = new HashMap<>();
     private final DockerDriver dockerDriver;
 
     public DockerLiquibaseEnvironmentBuilder(LocalLiquibaseEnvironmentBuilder localEnvironmentBuilder) {
         this.localEnvironmentBuilder = localEnvironmentBuilder;
 
-        dockerDriver = new DockerDriver(CONTAINER_NAME, ORACLE_XE_LATEST_IMAGE_NAME, ORACLE_XE_PORTS);
+        internalToExternalPortsMap.put(1521, 1521);
+
+        dockerDriver = new DockerDriver(CONTAINER_NAME, ORACLE_XE_LATEST_IMAGE_NAME, internalToExternalPortsMap);
+    }
+
+    public Map<Integer, Integer> getInternalToExternalPortsMap() {
+        return internalToExternalPortsMap;
     }
 
     @Override

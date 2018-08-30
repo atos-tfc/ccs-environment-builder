@@ -8,12 +8,14 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slinkyframework.environment.builder.liquibase.LiquibaseBuildDefinition;
 import org.slinkyframework.environment.builder.liquibase.docker.DockerLiquibaseEnvironmentBuilder;
-import org.slinkyframework.environment.builder.liquibase.drivers.DatabaseDriver;
 import org.slinkyframework.environment.builder.liquibase.drivers.DatabaseProperties;
 import org.slinkyframework.environment.builder.liquibase.drivers.oracle.OracleProperties;
 import org.slinkyframework.environment.builder.liquibase.local.LocalLiquibaseEnvironmentBuilder;
 import org.slinkyframework.environment.docker.DockerDriver;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TreeSet;
 
 import static org.hamcrest.Matchers.is;
@@ -36,7 +38,6 @@ public class DockerlLiquibaseEnvironmentBuilderIntegrationTest {
 
     private static final String CONTAINER_NAME = "oracle-xe";
     private static final String IMAGE_NAME = "alexeiled/docker-oracle-xe-11g";
-    private static final int[] PORTS = { TEST_PORT, 8080};
 
     @Mock
     private LocalLiquibaseEnvironmentBuilder mockLocalLiquibaseEnvironmentBuilder;
@@ -44,18 +45,16 @@ public class DockerlLiquibaseEnvironmentBuilderIntegrationTest {
     private DockerLiquibaseEnvironmentBuilder testee;
     private DockerLiquibaseEnvironmentBuilder mockedTestee;
 
-    private DatabaseProperties databaseProperties;
-    private DatabaseDriver databaseDriver;
     private DockerDriver dockerDriver;
     private TreeSet<LiquibaseBuildDefinition> buildDefinitions;
 
     @Before
-    public void setUp() {
+    public void setUp() throws IOException {
         testee = new DockerLiquibaseEnvironmentBuilder(new LocalLiquibaseEnvironmentBuilder(TEST_HOST));
 
-        dockerDriver = new DockerDriver(CONTAINER_NAME, IMAGE_NAME, PORTS);
+        dockerDriver = new DockerDriver(CONTAINER_NAME, IMAGE_NAME, testee.getInternalToExternalPortsMap());
 
-        databaseProperties = new OracleProperties(TEST_USERNAME, TEST_PASSWORD, TEST_PORT, TEST_SID, TEST_USER1);
+        DatabaseProperties databaseProperties = new OracleProperties(TEST_USERNAME, TEST_PASSWORD, TEST_PORT, TEST_SID, TEST_USER1);
         LiquibaseBuildDefinition liquibaseBuildDefinition = new LiquibaseBuildDefinition(TEST_NAME, databaseProperties, TEST_CHANGE_LOG);
 
         buildDefinitions = new TreeSet<>();

@@ -1,8 +1,10 @@
 package org.slinkyframework.environment.builder.liquibase.test.local;
 
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.slinkyframework.environment.builder.liquibase.LiquibaseBuildDefinition;
-import org.slinkyframework.environment.builder.liquibase.docker.DockerLiquibaseEnvironmentBuilder;
 import org.slinkyframework.environment.builder.liquibase.drivers.DatabaseDriver;
 import org.slinkyframework.environment.builder.liquibase.drivers.DatabaseDriverFactory;
 import org.slinkyframework.environment.builder.liquibase.drivers.DatabaseProperties;
@@ -11,14 +13,14 @@ import org.slinkyframework.environment.builder.liquibase.local.LocalLiquibaseEnv
 import org.slinkyframework.environment.docker.DockerDriver;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import static org.junit.Assert.assertThat;
 import static org.slinkyframework.environment.builder.liquibase.docker.DockerLiquibaseEnvironmentBuilder.CONTAINER_NAME;
 import static org.slinkyframework.environment.builder.liquibase.docker.DockerLiquibaseEnvironmentBuilder.ORACLE_XE_LATEST_IMAGE_NAME;
-import static org.slinkyframework.environment.builder.liquibase.docker.DockerLiquibaseEnvironmentBuilder.ORACLE_XE_PORTS;
 import static org.slinkyframework.environment.builder.liquibase.test.matchers.OracleUserExistsMatcher.userExists;
 
 public class LocalLiquibaseEnvironmentBuilderIntegrationTest {
@@ -40,7 +42,10 @@ public class LocalLiquibaseEnvironmentBuilderIntegrationTest {
 
     @BeforeClass
     public static void setUpOnce() throws InterruptedException {
-        dockerDriver = new DockerDriver(CONTAINER_NAME, ORACLE_XE_LATEST_IMAGE_NAME, ORACLE_XE_PORTS);
+        Map<Integer, Integer> internalToExternalPortsMap = new HashMap<>();
+        internalToExternalPortsMap.put(1521, 1521);
+
+        dockerDriver = new DockerDriver(CONTAINER_NAME, ORACLE_XE_LATEST_IMAGE_NAME, internalToExternalPortsMap);
         dockerDriver.setUpDocker();
 
         Thread.sleep(10000);

@@ -11,6 +11,8 @@ import org.slinkyframework.environment.builder.couchbase.docker.DockerCouchbaseE
 import org.slinkyframework.environment.builder.couchbase.local.LocalCouchbaseEnvironmentBuilder;
 import org.slinkyframework.environment.docker.DockerDriver;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -19,7 +21,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 import static org.slinkyframework.environment.builder.couchbase.docker.DockerCouchbaseEnvironmentBuilder.CONTAINER_NAME;
 import static org.slinkyframework.environment.builder.couchbase.docker.DockerCouchbaseEnvironmentBuilder.COUCHBASE_LATEST_IMAGE_NAME;
-import static org.slinkyframework.environment.builder.couchbase.docker.DockerCouchbaseEnvironmentBuilder.COUCHBASE_PORTS;
 import static org.slinkyframework.environment.docker.test.matchers.HasPortAvailableMatcher.hasPortAvailable;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -38,22 +39,20 @@ public class DockerCouchbaseEnvironmentBuilderIntegrationTest {
     private DockerCouchbaseEnvironmentBuilder testee;
 
     private Set<CouchbaseBuildDefinition> buildDefinitions;
-    private CouchbaseBuildDefinition definition1;
-    private CouchbaseBuildDefinition definition2;
     private DockerDriver dockerDriver;
 
     @Before
     public void setUp() throws DockerCertificateException {
 
-        dockerDriver = new DockerDriver(CONTAINER_NAME, COUCHBASE_LATEST_IMAGE_NAME, COUCHBASE_PORTS);
-
         testee = new DockerCouchbaseEnvironmentBuilder(mockLocalCouchbaseEnvironmentBuilder);
         buildDefinitions = new TreeSet<>();
-        definition1 = new CouchbaseBuildDefinition("Definition1", TEST_BUCKET_1_NAME, TEST_DOCUMENT_PACKAGE, TEST_DOCUMENT_CLASS_NAME);
+        CouchbaseBuildDefinition definition1 = new CouchbaseBuildDefinition("Definition1", TEST_BUCKET_1_NAME, TEST_DOCUMENT_PACKAGE, TEST_DOCUMENT_CLASS_NAME);
         definition1.setBucketPassword(TEST_BUCKET_1_PASSWORD);
 
-        definition2 = new CouchbaseBuildDefinition("Definition2", TEST_BUCKET_2_NAME, TEST_DOCUMENT_PACKAGE, TEST_DOCUMENT_CLASS_NAME);
+        CouchbaseBuildDefinition definition2 = new CouchbaseBuildDefinition("Definition2", TEST_BUCKET_2_NAME, TEST_DOCUMENT_PACKAGE, TEST_DOCUMENT_CLASS_NAME);
         definition2.setBucketPassword(TEST_BUCKET_2_PASSWORD);
+
+        dockerDriver = new DockerDriver(CONTAINER_NAME, COUCHBASE_LATEST_IMAGE_NAME, testee.getInternalToExternalPortsMap());
 
         // Make sure no Docker containers left lying around
         testee.tearDown(buildDefinitions);

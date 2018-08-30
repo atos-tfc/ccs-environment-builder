@@ -4,20 +4,20 @@ import oracle.jdbc.pool.OracleDataSource;
 import org.junit.*;
 import org.slinkyframework.environment.builder.liquibase.drivers.DatabaseDriver;
 import org.slinkyframework.environment.builder.liquibase.drivers.DatabaseDriverFactory;
-import org.slinkyframework.environment.builder.liquibase.drivers.oracle.OracleProperties;
 import org.slinkyframework.environment.builder.liquibase.drivers.oracle.OracleDatabaseDriver;
+import org.slinkyframework.environment.builder.liquibase.drivers.oracle.OracleProperties;
 import org.slinkyframework.environment.docker.DockerDriver;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.lang.String.format;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
-import static org.slinkyframework.environment.builder.liquibase.docker.DockerLiquibaseEnvironmentBuilder.CONTAINER_NAME;
-import static org.slinkyframework.environment.builder.liquibase.docker.DockerLiquibaseEnvironmentBuilder.ORACLE_XE_LATEST_IMAGE_NAME;
-import static org.slinkyframework.environment.builder.liquibase.docker.DockerLiquibaseEnvironmentBuilder.ORACLE_XE_PORTS;
+import static org.slinkyframework.environment.builder.liquibase.docker.DockerLiquibaseEnvironmentBuilder.*;
 import static org.slinkyframework.environment.builder.liquibase.test.matchers.OracleUserExistsMatcher.userExists;
 
 public class OracleDatabaseDriverIntegrationTest {
@@ -34,7 +34,10 @@ public class OracleDatabaseDriverIntegrationTest {
 
     @BeforeClass
     public static void setUpOnce() throws InterruptedException {
-        dockerDriver = new DockerDriver(CONTAINER_NAME, ORACLE_XE_LATEST_IMAGE_NAME, ORACLE_XE_PORTS);
+        Map<Integer, Integer> internalToExternalPortsMap = new HashMap<>();
+        internalToExternalPortsMap.put(1521, 1521);
+
+        dockerDriver = new DockerDriver(CONTAINER_NAME, ORACLE_XE_LATEST_IMAGE_NAME, internalToExternalPortsMap);
         dockerDriver.setUpDocker();
 
         Thread.sleep(10000);

@@ -18,15 +18,11 @@ import org.slinkyframework.environment.builder.couchbase.DocumentDefinition;
 import org.slinkyframework.environment.builder.couchbase.docker.DockerCouchbaseEnvironmentBuilder;
 import org.slinkyframework.environment.builder.couchbase.local.ConnectionManager;
 import org.slinkyframework.environment.builder.couchbase.local.LocalCouchbaseEnvironmentBuilder;
-import org.slinkyframework.environment.docker.DockerDriver;
 
 import java.util.TreeSet;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
-import static org.slinkyframework.environment.builder.couchbase.docker.DockerCouchbaseEnvironmentBuilder.CONTAINER_NAME;
-import static org.slinkyframework.environment.builder.couchbase.docker.DockerCouchbaseEnvironmentBuilder.COUCHBASE_LATEST_IMAGE_NAME;
-import static org.slinkyframework.environment.builder.couchbase.docker.DockerCouchbaseEnvironmentBuilder.COUCHBASE_PORTS;
 import static org.slinkyframework.environment.builder.couchbase.local.ConnectionManager.openBucket;
 import static org.slinkyframework.environment.builder.couchbase.matchers.CouchbaseMatchers.*;
 
