@@ -5,15 +5,12 @@ import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerCertificateException;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.messages.Image;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.slinkyframework.environment.builder.EnvironmentBuilderException;
 import org.slinkyframework.environment.docker.DockerDriver;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,18 +29,39 @@ public class DockerDriverIntegrationTest {
     private static final String ENVIRONMENT_DOCKER_MACHINE_NAME = "DOCKER_MACHINE_NAME";
     private static final String DEFAULT_DOCKER_MACHINE_NAME = "localhost";
 
-    private Map<Integer, Integer> ports = new HashMap<>();
     private String dockerMachineName = "dev";
 
     @Before
-    public void setUp() throws IOException {
-        ports.put(TOMCAT_INTERNAL_PORT, findFreePort());
-
+    public void setUp() {
         dockerMachineName = System.getenv(ENVIRONMENT_DOCKER_MACHINE_NAME);
 
         if (dockerMachineName == null) {
             dockerMachineName = DEFAULT_DOCKER_MACHINE_NAME;
         }
+    }
+
+    @Test
+    public void shouldStartAContainer() {
+        Map<Integer, Integer> ports = createPortsMap();
+        DockerDriver testee = new DockerDriver(CONTAINER_NAME, IMAGE_NAME, ports);
+
+        testee.setUpDocker();
+
+        assertThat("Container", testee.findExistingContainer().isPresent(), is(true));
+        assertThat(dockerMachineName, hasPortAvailable(ports.get(TOMCAT_INTERNAL_PORT)));
+
+    }
+
+    private Map<Integer, Integer> createPortsMap() {
+        try {
+            Map<Integer, Integer> ports = new HashMap<>();
+            ports.put(TOMCAT_INTERNAL_PORT, findFreePort());
+
+            return ports;
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to find free port", e);
+        }
+
     }
 
     private Integer findFreePort() throws IOException {
@@ -52,18 +70,8 @@ public class DockerDriverIntegrationTest {
     }
 
     @Test
-    public void shouldStartAContainer() {
-        DockerDriver testee = new DockerDriver(CONTAINER_NAME, IMAGE_NAME, ports);
-
-        testee.setUpDocker();
-
-        assertThat("Container", testee.findExistingContainer().isPresent(), is(true));
-        assertThat(dockerMachineName, hasPortAvailable(ports.get(8080)));
-
-    }
-
-    @Test
     public void shouldKillAndRemoveAContainer() {
+        Map<Integer, Integer> ports = createPortsMap();
         DockerDriver testee = new DockerDriver(CONTAINER_NAME, IMAGE_NAME, ports);
 
         testee.setUpDocker();
@@ -76,6 +84,7 @@ public class DockerDriverIntegrationTest {
     @Test
     @Ignore("Takes a long time to run. So ignoring for main run.")
     public void shouldPullDownImageIfOneDoesNotExistLocally() throws Exception {
+        Map<Integer, Integer> ports = createPortsMap();
         DockerDriver testee = new DockerDriver(CONTAINER_NAME, IMAGE_NAME, ports);
         Optional<Image> image = testee.findImage();
 
