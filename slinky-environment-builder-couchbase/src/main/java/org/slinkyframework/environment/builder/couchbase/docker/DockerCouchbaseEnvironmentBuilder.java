@@ -11,6 +11,7 @@ import org.slinkyframework.environment.builder.EnvironmentBuilderException;
 import org.slinkyframework.environment.builder.couchbase.CouchbaseBuildDefinition;
 import org.slinkyframework.environment.builder.couchbase.local.LocalCouchbaseEnvironmentBuilder;
 import org.slinkyframework.environment.docker.DockerDriver;
+import org.slinkyframework.environment.docker.PortSelector;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +31,7 @@ public class DockerCouchbaseEnvironmentBuilder implements EnvironmentBuilder<Cou
 
     public static final String CONTAINER_NAME = "slinky_couchbase";
     public static final String COUCHBASE_LATEST_IMAGE_NAME = "couchbase:latest";
+    public  static final int[] COUCHBASE_PORTS = { 8091, 8092, 8093, 8094, 11207, 11210, 11211 };
 
     private final LocalCouchbaseEnvironmentBuilder localEnvironmentBuilder;
     private final Map<Integer, Integer> internalToExternalPortsMap = new HashMap<>();
@@ -38,13 +40,9 @@ public class DockerCouchbaseEnvironmentBuilder implements EnvironmentBuilder<Cou
     public DockerCouchbaseEnvironmentBuilder(LocalCouchbaseEnvironmentBuilder localEnvironmentBuilder) {
         this.localEnvironmentBuilder = localEnvironmentBuilder;
 
-        internalToExternalPortsMap.put(8091, 8091);
-        internalToExternalPortsMap.put(8092, 8092);
-        internalToExternalPortsMap.put(8093, 8093);
-        internalToExternalPortsMap.put(8094, 8094);
-        internalToExternalPortsMap.put(11207, 11207);
-        internalToExternalPortsMap.put(11210, 11210);
-        internalToExternalPortsMap.put(11211, 11211);
+        for (int port: COUCHBASE_PORTS) {
+            internalToExternalPortsMap.put(port, PortSelector.selectPort(port));
+        }
 
         dockerDriver = new DockerDriver(CONTAINER_NAME, COUCHBASE_LATEST_IMAGE_NAME, internalToExternalPortsMap);
     }

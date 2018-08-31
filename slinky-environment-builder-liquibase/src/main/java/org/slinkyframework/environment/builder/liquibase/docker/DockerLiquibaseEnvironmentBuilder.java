@@ -4,6 +4,7 @@ import org.slinkyframework.environment.builder.EnvironmentBuilder;
 import org.slinkyframework.environment.builder.liquibase.LiquibaseBuildDefinition;
 import org.slinkyframework.environment.builder.liquibase.local.LocalLiquibaseEnvironmentBuilder;
 import org.slinkyframework.environment.docker.DockerDriver;
+import org.slinkyframework.environment.docker.PortSelector;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +22,7 @@ public class DockerLiquibaseEnvironmentBuilder implements EnvironmentBuilder<Liq
 
     public static final String CONTAINER_NAME = "oracle-xe";
     public static final String ORACLE_XE_LATEST_IMAGE_NAME = "alexeiled/docker-oracle-xe-11g";
+    public  static final int[] ORACLE_XE_PORTS = { 1521 };
 
     private final LocalLiquibaseEnvironmentBuilder localEnvironmentBuilder;
     private final Map<Integer, Integer> internalToExternalPortsMap = new HashMap<>();
@@ -29,7 +31,9 @@ public class DockerLiquibaseEnvironmentBuilder implements EnvironmentBuilder<Liq
     public DockerLiquibaseEnvironmentBuilder(LocalLiquibaseEnvironmentBuilder localEnvironmentBuilder) {
         this.localEnvironmentBuilder = localEnvironmentBuilder;
 
-        internalToExternalPortsMap.put(1521, 1521);
+        for (int port: ORACLE_XE_PORTS) {
+            internalToExternalPortsMap.put(port, PortSelector.selectPort(port));
+        }
 
         dockerDriver = new DockerDriver(CONTAINER_NAME, ORACLE_XE_LATEST_IMAGE_NAME, internalToExternalPortsMap);
     }

@@ -10,14 +10,13 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.slinkyframework.environment.docker.DockerDriver;
 
-import java.io.IOException;
-import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.slinkyframework.environment.docker.PortSelector.selectFreePort;
 import static org.slinkyframework.environment.docker.test.matchers.HasPortAvailableMatcher.hasPortAvailable;
 
 public class DockerDriverIntegrationTest {
@@ -53,20 +52,10 @@ public class DockerDriverIntegrationTest {
     }
 
     private Map<Integer, Integer> createPortsMap() {
-        try {
-            Map<Integer, Integer> ports = new HashMap<>();
-            ports.put(TOMCAT_INTERNAL_PORT, findFreePort());
+        Map<Integer, Integer> ports = new HashMap<>();
+        ports.put(TOMCAT_INTERNAL_PORT, selectFreePort());
 
-            return ports;
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to find free port", e);
-        }
-
-    }
-
-    private Integer findFreePort() throws IOException {
-        ServerSocket s = new ServerSocket(0);
-        return s.getLocalPort();
+        return ports;
     }
 
     @Test
@@ -105,5 +94,4 @@ public class DockerDriverIntegrationTest {
             dockerClient.removeImage(image.get().id(), force, noPrune);
         }
     }
-
 }
