@@ -1,6 +1,5 @@
 package org.slinkyframework.environment.builder.liquibase.test;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.junit.Before;
 import org.junit.Test;
 import org.slinkyframework.environment.builder.EnvironmentBuilder;

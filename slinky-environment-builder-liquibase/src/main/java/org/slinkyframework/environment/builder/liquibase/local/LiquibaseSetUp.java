@@ -51,7 +51,5 @@ public class LiquibaseSetUp {
         } finally {
             databaseDriver.cleanUp();
         }
-
-
     }
 }
