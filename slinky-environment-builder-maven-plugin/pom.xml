@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.slinkyframework.environment</groupId>
         <artifactId>slinky-environment-parent</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>slinky-environment-builder-maven-plugin</artifactId>
@@ -27,7 +27,7 @@
         <dependency>
             <groupId>org.slinkyframework.environment</groupId>
             <artifactId>slinky-environment-builder</artifactId>
-            <version>1.0.1</version>
+            <version>1.0.2-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
