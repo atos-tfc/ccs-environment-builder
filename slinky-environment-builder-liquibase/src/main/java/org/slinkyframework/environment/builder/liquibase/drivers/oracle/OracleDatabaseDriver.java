@@ -15,6 +15,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import static java.lang.String.format;
 
@@ -90,6 +91,8 @@ public class OracleDatabaseDriver implements DatabaseDriver {
     @Override
     public void tearDown() {
         properties.getUsers().forEach(this::dropUser);
+        properties.getUsers().forEach(this::dropPublicSynonyms);
+        properties.getTablespaces().forEach(this::dropTablespace);
     }
 
     private void dropUser(String username) {
@@ -101,8 +104,39 @@ public class OracleDatabaseDriver implements DatabaseDriver {
             try {
                 jdbcTemplate.execute(format("DROP USER %s CASCADE", username));
             } catch (UserDoesNotExistException e) {
-                LOGGER.debug("Unable to drop user '{}'. Uesr does not exist.");
+                LOGGER.debug("Unable to drop user '{}'. User does not exist.", username);
             }
+        }
+    }
+
+    private void dropPublicSynonyms(String username) {
+        LOGGER.info("Dropping public synonyms user '{}'", username);
+
+        findPublicSynonymsForUser(username).stream()
+                .forEach(this::dropPublicSynonym);
+    }
+
+    private List<String> findPublicSynonymsForUser(String username) {
+        return jdbcTemplate.queryForList("select SYNONYM_NAME from ALL_SYNONYMS where TABLE_OWNER like ?", String.class, username);
+    }
+
+    private void dropPublicSynonym(String synonymName) {
+        LOGGER.info("Dropping public synonyms '{}'", synonymName);
+        try {
+            jdbcTemplate.execute(format("DROP PUBLIC SYNONYM %s", synonymName));
+        } catch (UserDoesNotExistException e) {
+            LOGGER.debug("Unable to drop public synonym '{}'. {}", synonymName, e.getMessage());
+        }
+    }
+
+    private void dropTablespace(String tablespace) {
+        LOGGER.info("Dropping database tablespace '{}'", tablespace);
+
+        try {
+            jdbcTemplate.execute(format("DROP TABLESPACE %s INCLUDING CONTENTS AND DATAFILES", tablespace));
+        } catch (Exception e) {
+            LOGGER.error("Unable to drop tablespace '{}'. {}", tablespace, e.getMessage(), e);
+            throw e;
         }
     }
 

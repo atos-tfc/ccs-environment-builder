@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,7 +56,7 @@ public class OracleDatabaseDriverIntegrationTest {
         int port = 1521;
         String sid = "XE";
 
-        OracleProperties properties = new OracleProperties(username, password, port, sid, TEST_USER1, TEST_USER2);
+        OracleProperties properties = new OracleProperties(username, password, port, sid, Arrays.asList(TEST_USER1, TEST_USER2));
 
         testee = DatabaseDriverFactory.getInstance(properties);
 
