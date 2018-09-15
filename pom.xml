@@ -32,8 +32,8 @@
     </licenses>
     <scm>
         <url>https://github.com/klyall/slinky-framework</url>
-        <connection>scm:git:git@github.com:klyall/slinky-environment.git</connection>
-        <developerConnection>scm:git:git@github.com:klyall/slinky-environment.git</developerConnection>
+        <connection>scm:git:https://github.com/klyall/slinky-environment.git</connection>
+        <developerConnection>scm:git:https://github.com/klyall/slinky-environment.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
     <issueManagement>
