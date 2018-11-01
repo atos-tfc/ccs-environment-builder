@@ -60,21 +60,14 @@ public class LocalLiquibaseEnvironmentBuilderIntegrationTest {
     }
 
     @Test
-    public void shouldSetUpUserFromLiquibase() throws SQLException {
-        testee.setUp(toSet(createLiquibaseBuildDefinition()));
-
-        databaseDriver.createConnection(TEST_HOST);
-        assertThat(databaseDriver.getDataSource(), userExists(TEST_USER1));
-    }
-
-    @Test
-    public void shouldTearDownAUser() throws SQLException {
+    public void shouldSetUpAndthenTearDownAUser() throws SQLException {
         LiquibaseBuildDefinition liquibaseBuildDefinition = createLiquibaseBuildDefinition();
+        databaseDriver.createConnection(TEST_HOST);
+
         testee.setUp(toSet(liquibaseBuildDefinition));
+        assertThat(databaseDriver.getDataSource(), userExists(TEST_USER1));
 
         testee.tearDown(toSet(liquibaseBuildDefinition));
-
-        databaseDriver.createConnection(TEST_HOST);
         assertThat(databaseDriver.getDataSource(), not(userExists(TEST_USER1)));
     }
 }
