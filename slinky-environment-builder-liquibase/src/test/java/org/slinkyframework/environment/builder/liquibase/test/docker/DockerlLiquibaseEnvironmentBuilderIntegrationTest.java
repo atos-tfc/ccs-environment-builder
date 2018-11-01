@@ -14,8 +14,6 @@ import org.slinkyframework.environment.builder.liquibase.local.LocalLiquibaseEnv
 import org.slinkyframework.environment.docker.DockerDriver;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.TreeSet;
 
 import static org.hamcrest.Matchers.is;
@@ -30,6 +28,7 @@ public class DockerlLiquibaseEnvironmentBuilderIntegrationTest {
     private static final String TEST_HOST = "localvm";
     private static final String TEST_NAME = "TEST_NAME";
     private static final String TEST_USER1 = "TEST_USER1";
+    private static final String TEST_CHANGE_LOG_PREFIX = "test";
     private static final String TEST_CHANGE_LOG = "liquibase/test.db.changelog-master.xml";
     private static final  String TEST_USERNAME = "system";
     private static final String TEST_PASSWORD = "oracle";
@@ -54,8 +53,11 @@ public class DockerlLiquibaseEnvironmentBuilderIntegrationTest {
 
         dockerDriver = new DockerDriver(CONTAINER_NAME, IMAGE_NAME, testee.getInternalToExternalPortsMap());
 
-        DatabaseProperties databaseProperties = new OracleProperties(TEST_USERNAME, TEST_PASSWORD, TEST_PORT, TEST_SID, TEST_USER1);
-        LiquibaseBuildDefinition liquibaseBuildDefinition = new LiquibaseBuildDefinition(TEST_NAME, databaseProperties, TEST_CHANGE_LOG);
+        DatabaseProperties databaseProperties =
+                new OracleProperties(TEST_USERNAME, TEST_PASSWORD, TEST_PORT, TEST_SID, TEST_USER1);
+
+        LiquibaseBuildDefinition liquibaseBuildDefinition =
+                new LiquibaseBuildDefinition(TEST_NAME, databaseProperties, TEST_CHANGE_LOG_PREFIX, TEST_CHANGE_LOG);
 
         buildDefinitions = new TreeSet<>();
         buildDefinitions.add(liquibaseBuildDefinition);

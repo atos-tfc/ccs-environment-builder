@@ -13,6 +13,7 @@ import static org.junit.Assert.assertThat;
 @RunWith(MockitoJUnitRunner.class)
 public class LiquibaseBuildDefinitionTest {
 
+    private static final String TEST_CHANGE_LOG_PREFIX = "test";
     private static final String TEST_CHANGE_LOG_XML = "test-changeLog.xml";
     private static final String TEST_NAME = "TEST";
 
@@ -21,7 +22,8 @@ public class LiquibaseBuildDefinitionTest {
 
     @Test
     public void shouldBeAbleToSpecifyDatabaseConnectionDetailsInBuildDefinition() {
-        LiquibaseBuildDefinition testee = new LiquibaseBuildDefinition(TEST_NAME, mockDatabaseProperties, TEST_CHANGE_LOG_XML);
+        LiquibaseBuildDefinition testee =
+                new LiquibaseBuildDefinition(TEST_NAME, mockDatabaseProperties, TEST_CHANGE_LOG_PREFIX, TEST_CHANGE_LOG_XML);
 
         assertThat(testee.getName(), is("TEST"));
         assertThat(testee.getDatabaseProperties(), is(mockDatabaseProperties));

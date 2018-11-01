@@ -33,7 +33,7 @@ public class LiquibaseSetUp {
         DatabaseDriver databaseDriver = null;
 
         try {
-            databaseDriver = DatabaseDriverFactory.getInstance(definition.getDatabaseProperties());
+            databaseDriver = DatabaseDriverFactory.getInstance(definition);
 
             Connection con = databaseDriver.createConnection(hostname);
 

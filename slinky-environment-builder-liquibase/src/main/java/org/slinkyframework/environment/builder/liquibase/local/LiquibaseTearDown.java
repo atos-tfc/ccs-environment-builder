@@ -26,7 +26,7 @@ public class LiquibaseTearDown {
         DatabaseDriver databaseDriver = null;
 
         try {
-            databaseDriver = DatabaseDriverFactory.getInstance(definition.getDatabaseProperties());
+            databaseDriver = DatabaseDriverFactory.getInstance(definition);
 
             databaseDriver.createConnection(hostname);
 
