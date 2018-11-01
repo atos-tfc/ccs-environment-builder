@@ -1,6 +1,6 @@
 # Slinky Environment Builder
 
-[Home](../README.md) > Environment Builder
+[Release Notes](releases.md) 
 
 ## Introduction
 A significant problem when developing an automated test suite for an application is having a environment to run the tests against that is setup consistently on all machines and has data in a known, consistent state. 
