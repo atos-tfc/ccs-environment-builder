@@ -62,7 +62,6 @@
         <module>slinky-environment-builder-couchbase</module>
         <module>slinky-environment-builder-liquibase</module>
         <module>slinky-environment-builder-maven-plugin</module>
-        <module>slinky-environment-config-maven-plugin</module>
     </modules>
 
 </project>
