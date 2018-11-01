@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.slinkyframework.environment</groupId>
         <artifactId>slinky-environment-parent</artifactId>
-        <version>1.0.2-SNAPSHOT</version>
+        <version>1.0.2</version>
     </parent>
 
     <artifactId>slinky-environment-builder-liquibase</artifactId>
@@ -23,12 +23,12 @@
         <dependency>
             <groupId>org.slinkyframework.environment</groupId>
             <artifactId>slinky-environment-builder</artifactId>
-            <version>1.0.2-SNAPSHOT</version>
+            <version>1.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.slinkyframework.environment</groupId>
             <artifactId>slinky-common-docker</artifactId>
-            <version>1.0.2-SNAPSHOT</version>
+            <version>1.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -42,7 +42,7 @@
         <dependency>
             <groupId>org.slinkyframework.environment</groupId>
             <artifactId>slinky-common-docker</artifactId>
-            <version>1.0.2-SNAPSHOT</version>
+            <version>1.0.2</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
