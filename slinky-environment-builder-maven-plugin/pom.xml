@@ -4,11 +4,12 @@
 
     <parent>
         <groupId>org.slinkyframework.environment</groupId>
-        <artifactId>slinky-environment-parent</artifactId>
+        <artifactId>slinky-environment-builder-parent</artifactId>
         <version>1.0.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>slinky-environment-builder-maven-plugin</artifactId>
+
     <packaging>maven-plugin</packaging>
 
     <dependencies>
