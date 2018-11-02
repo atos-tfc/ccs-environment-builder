@@ -9,14 +9,14 @@
     </parent>
 
     <groupId>org.slinkyframework.environment</groupId>
-    <artifactId>slinky-environment-parent</artifactId>
+    <artifactId>slinky-environment-builder-parent</artifactId>
     <version>1.0.3-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
-    <name>slinky-environment-parent</name>
-    <description>Slinky Environment</description>
-    <url>https://github.com/klyall/slinky-environment</url>
+    <name>slinky-environment-builder-parent</name>
+    <description>Slinky Environment Builder</description>
+    <url>https://github.com/klyall/slinky-environment-builder</url>
 
     <developers>
         <developer>
@@ -31,17 +31,17 @@
         </license>
     </licenses>
     <scm>
-        <url>https://github.com/klyall/slinky-framework</url>
-        <connection>scm:git:https://github.com/klyall/slinky-environment.git</connection>
-        <developerConnection>scm:git:https://github.com/klyall/slinky-environment.git</developerConnection>
+        <url>https://github.com/klyall/slinky-environment-builder</url>
+        <connection>scm:git:https://github.com/klyall/slinky-environment-builder.git</connection>
+        <developerConnection>scm:git:https://github.com/klyall/slinky-environment-builder.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
     <issueManagement>
-        <url>https://github.com/klyall/slinky-environment/issues</url>
+        <url>https://github.com/klyall/slinky-environment-builder/issues</url>
         <system>GitHub</system>
     </issueManagement>
     <ciManagement>
-        <url>https://travis-ci.org/klyall/slinky-environment</url>
+        <url>https://travis-ci.org/klyall/slinky-environment-builder</url>
         <system>Travis-CI</system>
     </ciManagement>
 
