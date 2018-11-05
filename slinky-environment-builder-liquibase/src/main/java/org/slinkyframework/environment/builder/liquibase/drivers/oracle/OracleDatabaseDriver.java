@@ -1,12 +1,14 @@
 package org.slinkyframework.environment.builder.liquibase.drivers.oracle;
 
-import oracle.jdbc.pool.OracleDataSource;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slinkyframework.environment.builder.EnvironmentBuilderException;
 import org.slinkyframework.environment.builder.liquibase.drivers.DatabaseDriver;
+import org.slinkyframework.environment.builder.liquibase.drivers.TableDoesNotExistException;
+import org.slinkyframework.environment.builder.liquibase.drivers.TablespaceDoesNotExistException;
 import org.slinkyframework.environment.builder.liquibase.drivers.UserDoesNotExistException;
-import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.retry.backoff.FixedBackOffPolicy;
@@ -14,9 +16,7 @@ import org.springframework.retry.policy.TimeoutRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -33,8 +33,7 @@ public class OracleDatabaseDriver implements DatabaseDriver {
 
     private OracleProperties properties;
     private String changeLogPrefix;
-    private Connection connection;
-    private OracleDataSource dataSource;
+    private HikariDataSource dataSource;
     private JdbcTemplate jdbcTemplate;
 
     public OracleDatabaseDriver(OracleProperties properties, String changeLogPrefix) {
@@ -43,38 +42,30 @@ public class OracleDatabaseDriver implements DatabaseDriver {
     }
 
     @Override
-    public Connection createConnection(String hostname) throws SQLException {
+    public void connect(String hostname) {
 
-        if (connection == null) {
-            dataSource = new OracleDataSource();
-            dataSource.setURL(properties.getUrl(hostname));
-            dataSource.setUser(properties.getUsername());
-            dataSource.setPassword(properties.getPassword());
-
-            waitForConnection(dataSource);
-
-            jdbcTemplate = new JdbcTemplate(dataSource);
-            jdbcTemplate.setExceptionTranslator(new OracleSQLExceptionTranslator());
+        if (dataSource == null) {
+            createDataSource(hostname);
+            createJdbcTemplate();
         }
-
-        return connection;
     }
 
-    private void waitForConnection(OracleDataSource dataSource) throws SQLException {
-        LOGGER.debug("Connecting to database '{}'", dataSource.getURL());
 
-        TimeoutRetryPolicy retryPolicy = new TimeoutRetryPolicy();
-        retryPolicy.setTimeout(THIRTY_SECONDS);
+    private void createDataSource(String hostname) {
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(properties.getUrl(hostname));
+        config.setUsername(properties.getUsername());
+        config.setPassword(properties.getPassword());
+        config.setMinimumIdle(2);
+        config.setMaximumPoolSize(5);
+        config.setInitializationFailTimeout(THIRTY_SECONDS);
 
-        FixedBackOffPolicy backOffPolicy = new FixedBackOffPolicy();
-        backOffPolicy.setBackOffPeriod(ONE_SECOND);
+        dataSource = new HikariDataSource(config);
+    }
 
-        RetryTemplate retryTemplate = new RetryTemplate();
-        retryTemplate.setRetryPolicy(retryPolicy);
-        retryTemplate.setThrowLastExceptionOnExhausted(true);
-        retryTemplate.setBackOffPolicy(backOffPolicy);
-
-        retryTemplate.execute(rc -> connection = dataSource.getConnection());
+    private void createJdbcTemplate() {
+        jdbcTemplate = new JdbcTemplate(dataSource);
+        jdbcTemplate.setExceptionTranslator(new OracleSQLExceptionTranslator());
     }
 
     @Override
@@ -83,20 +74,9 @@ public class OracleDatabaseDriver implements DatabaseDriver {
     }
 
     @Override
-    public void cleanUp() {
+    public void tearDown(String hostname) {
+        connect(hostname);
 
-        if (connection != null) {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                LOGGER.debug("Problem closing database connection", e);
-
-            }
-        }
-    }
-
-    @Override
-    public void tearDown() {
         properties.getUsers().forEach(this::dropUser);
         properties.getUsers().forEach(this::dropPublicSynonyms);
         properties.getTablespaces().forEach(this::dropTablespace);
@@ -105,7 +85,7 @@ public class OracleDatabaseDriver implements DatabaseDriver {
     }
 
     private void dropUser(String username) {
-        if (connection != null && jdbcTemplate != null) {
+        if (jdbcTemplate != null) {
             try {
                 killSessions(username);
             } catch (EnvironmentBuilderException e) {
@@ -160,13 +140,8 @@ public class OracleDatabaseDriver implements DatabaseDriver {
 
         try {
             jdbcTemplate.execute(format("DROP TABLESPACE %s INCLUDING CONTENTS AND DATAFILES", tablespace));
-        } catch (UncategorizedSQLException e) {
-            if (e.getMessage().contains("ORA-00959")) {
-                LOGGER.debug("Unable to drop tablespace '{}'. Tablespace does not exist.", tablespace);
-            } else {
-                LOGGER.error("Unable to drop tablespace '{}'. {}", tablespace, e.getMessage(), e);
-                throw e;
-            }
+        } catch (TablespaceDoesNotExistException e) {
+            LOGGER.debug("Unable to drop tablespace '{}'. Tablespace does not exist.", tablespace);
         }
     }
 
@@ -195,6 +170,7 @@ public class OracleDatabaseDriver implements DatabaseDriver {
             verifyConnected();
 
             jdbcTemplate.update(format("ALTER SYSTEM KILL SESSION '%s,%s' ", sid, serial));
+
         } catch (Exception e) {
             LOGGER.debug(e.getMessage(), e);
         }
@@ -230,13 +206,8 @@ public class OracleDatabaseDriver implements DatabaseDriver {
 
         try {
             jdbcTemplate.update(DATABASECHANGELOG_SQL, parameter);
-        } catch (UncategorizedSQLException e) {
-            if (e.getMessage().contains("ORA-00942")) {
-                LOGGER.debug("Unable to cleanup DATABASECHANGELOG. Table does not exist.");
-            } else {
-                LOGGER.error("Unable to cleanup DATABASECHANGELOG. {}", e.getMessage(), e);
-                throw e;
-            }
+        } catch (TableDoesNotExistException e) {
+            LOGGER.debug("Unable to cleanup DATABASECHANGELOG. Table does not exist.");
         }
     }
 }

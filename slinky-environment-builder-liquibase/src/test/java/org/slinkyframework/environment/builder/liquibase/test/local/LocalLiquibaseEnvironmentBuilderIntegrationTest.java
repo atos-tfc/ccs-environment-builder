@@ -10,7 +10,9 @@ import org.slinkyframework.environment.builder.liquibase.drivers.DatabaseDriverF
 import org.slinkyframework.environment.builder.liquibase.drivers.DatabaseProperties;
 import org.slinkyframework.environment.builder.liquibase.local.LocalLiquibaseEnvironmentBuilder;
 import org.slinkyframework.environment.docker.DockerDriver;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 
+import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
@@ -41,6 +43,7 @@ public class LocalLiquibaseEnvironmentBuilderIntegrationTest {
     @Before
     public void setUp() {
         databaseDriver = DatabaseDriverFactory.getInstance(createLiquibaseBuildDefinition());
+        databaseDriver.connect(TEST_HOST);
     }
     
     @Test
@@ -62,12 +65,17 @@ public class LocalLiquibaseEnvironmentBuilderIntegrationTest {
     @Test
     public void shouldSetUpAndthenTearDownAUser() throws SQLException {
         LiquibaseBuildDefinition liquibaseBuildDefinition = createLiquibaseBuildDefinition();
-        databaseDriver.createConnection(TEST_HOST);
 
         testee.setUp(toSet(liquibaseBuildDefinition));
+        commitTransaction(databaseDriver.getDataSource());
+
         assertThat(databaseDriver.getDataSource(), userExists(TEST_USER1));
 
         testee.tearDown(toSet(liquibaseBuildDefinition));
         assertThat(databaseDriver.getDataSource(), not(userExists(TEST_USER1)));
+    }
+
+    private void commitTransaction(DataSource ds) throws SQLException {
+        DataSourceUtils.getConnection(ds).commit();
     }
 }

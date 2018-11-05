@@ -30,12 +30,8 @@ public class LiquibaseSetUp {
 
     public void setUp(LiquibaseBuildDefinition definition) {
 
-        DatabaseDriver databaseDriver = null;
-
         try {
-            databaseDriver = DatabaseDriverFactory.getInstance(definition);
-
-            Connection con = databaseDriver.createConnection(hostname);
+            Connection con = getNewConnection(definition);
 
             Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(con));
             ResourceAccessor resourceAccessor = new ClassLoaderResourceAccessor();
@@ -46,10 +42,25 @@ public class LiquibaseSetUp {
 
             liquibase.update("");
 
+            closeConnectionQuietly(con);
+
         } catch (LiquibaseException | SQLException e) {
             throw new EnvironmentBuilderException("Database setup has failed", e);
-        } finally {
-            databaseDriver.cleanUp();
+        }
+    }
+
+    private Connection getNewConnection(LiquibaseBuildDefinition definition) throws SQLException {
+        DatabaseDriver databaseDriver = DatabaseDriverFactory.getInstance(definition);
+        databaseDriver.connect(hostname);
+
+        return databaseDriver.getDataSource().getConnection();
+    }
+
+    private void closeConnectionQuietly(Connection con) {
+        try {
+            con.close();
+        } catch (SQLException e) {
+            // Ignore
         }
     }
 }
