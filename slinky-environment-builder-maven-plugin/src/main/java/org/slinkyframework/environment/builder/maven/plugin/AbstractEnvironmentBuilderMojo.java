@@ -16,7 +16,7 @@ public abstract class AbstractEnvironmentBuilderMojo extends AbstractMojo {
     @Parameter(property = "env.docker", defaultValue = "false", readonly = true)
     private boolean useDocker;
 
-    @Parameter(property = "env.skipTearDown", defaultValue = "false", readonly = true)
+    @Parameter(property = "env.skipTearDown", defaultValue = "true", readonly = true)
     private boolean skipTearDown;
 
     private EnvironmentManager environmentManager;
