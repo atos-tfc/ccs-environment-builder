@@ -169,7 +169,7 @@ public class OracleDatabaseDriver implements DatabaseDriver {
 
             verifyConnected();
 
-            jdbcTemplate.update(format("ALTER SYSTEM KILL SESSION '%s,%s' ", sid, serial));
+            jdbcTemplate.update(format("ALTER SYSTEM KILL SESSION '%s,%s' IMMEDIATE", sid, serial));
 
         } catch (Exception e) {
             LOGGER.debug(e.getMessage(), e);
