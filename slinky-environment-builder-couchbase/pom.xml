@@ -45,26 +45,24 @@
                         <exclude>**/*IntegrationTest.java</exclude>
                         <exclude>**/TestCollector.java</exclude>
                     </excludes>
-                    <!--<parallel>methods</parallel>-->
-                    <!--<threadCount>10</threadCount>-->
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${maven-failsafe-plugin.version}</version>
                 <executions>
                     <execution>
-                        <id>integration-test</id>
                         <goals>
-                            <goal>test</goal>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
                         </goals>
-                        <phase>integration-test</phase>
                         <configuration>
-                            <excludes>
-                                <exclude>none</exclude>
-                            </excludes>
                             <includes>
                                 <include>**/*IntegrationTest.java</include>
                             </includes>
-                            <!-- Force the integration tests to be single threaded to avoid a problem with the auto-wiring -->
-                            <!-- of the BranchRepository. It is null when run in parallel when there is more than one test. -->
                             <parallel>none</parallel>
+                            <argLine>${jacoco.agent.argLine}</argLine>
                         </configuration>
                     </execution>
                 </executions>

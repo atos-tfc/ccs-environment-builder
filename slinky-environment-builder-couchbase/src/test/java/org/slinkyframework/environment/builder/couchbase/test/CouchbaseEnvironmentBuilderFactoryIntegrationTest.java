@@ -1,26 +1,26 @@
-package org.slinkyframework.environment.builder.liquibase.test;
+package org.slinkyframework.environment.builder.couchbase.test;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.slinkyframework.environment.builder.EnvironmentBuilder;
 import org.slinkyframework.environment.builder.EnvironmentBuilderContext;
-import org.slinkyframework.environment.builder.liquibase.LiquibaseEnvironmentBuilderFactory;
-import org.slinkyframework.environment.builder.liquibase.docker.DockerLiquibaseEnvironmentBuilder;
-import org.slinkyframework.environment.builder.liquibase.local.LocalLiquibaseEnvironmentBuilder;
+import org.slinkyframework.environment.builder.couchbase.local.LocalCouchbaseEnvironmentBuilder;
+import org.slinkyframework.environment.builder.couchbase.CouchbaseEnvironmentBuilderFactory;
+import org.slinkyframework.environment.builder.couchbase.docker.DockerCouchbaseEnvironmentBuilder;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-public class LiquibaseEnvironmentBuilderFactoryTest {
+public class CouchbaseEnvironmentBuilderFactoryIntegrationTest {
 
     private static final String TEST_HOST = "test";
 
-    private LiquibaseEnvironmentBuilderFactory testee;
+    private CouchbaseEnvironmentBuilderFactory testee;
 
     @Before
     public void setUp() {
-        testee = new LiquibaseEnvironmentBuilderFactory();
+        testee = new CouchbaseEnvironmentBuilderFactory();
 
     }
 
@@ -31,7 +31,7 @@ public class LiquibaseEnvironmentBuilderFactoryTest {
 
         EnvironmentBuilder environmentBuilder = testee.getInstance(context);
 
-        assertThat("LiquibaseEnvironmentBuilder", environmentBuilder, is(instanceOf(LocalLiquibaseEnvironmentBuilder.class)));
+        assertThat("CouchbaseEnvironmentBuilder", environmentBuilder, is(instanceOf(LocalCouchbaseEnvironmentBuilder.class)));
     }
 
     @Test
@@ -41,6 +41,6 @@ public class LiquibaseEnvironmentBuilderFactoryTest {
 
         EnvironmentBuilder environmentBuilder = testee.getInstance(context);
 
-        assertThat("DockerLiquibaseEnvironmentBuilder", environmentBuilder, is(instanceOf(DockerLiquibaseEnvironmentBuilder.class)));
+        assertThat("CouchbaseEnvironmentBuilder", environmentBuilder, is(instanceOf(DockerCouchbaseEnvironmentBuilder.class)));
     }
 }

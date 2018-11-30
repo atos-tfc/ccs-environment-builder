@@ -28,3 +28,6 @@ Make tearDown more robust
 ### v1.0.4
 - Change default flag 'env.skipTearDown' to true as this is the most common usage.
 - Change to kill Oracle sessions with immediate effect.
+
+### v1.0.5
+- Add skip flag to allow Environment Builder plugin to be completely skipped e.g. when using -DskipITs add <skip>${skipITs}</skip> to configuration section of plugin.

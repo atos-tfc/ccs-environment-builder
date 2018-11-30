@@ -16,15 +16,18 @@ public abstract class AbstractEnvironmentBuilderMojo extends AbstractMojo {
     @Parameter(property = "env.docker", defaultValue = "false", readonly = true)
     private boolean useDocker;
 
+    @Parameter(property = "env.skip", defaultValue = "false", readonly = true)
+    private boolean skip;
+
     @Parameter(property = "env.skipTearDown", defaultValue = "true", readonly = true)
     private boolean skipTearDown;
 
     private EnvironmentManager environmentManager;
 
     public AbstractEnvironmentBuilderMojo() {
-        this(new EnvironmentManagerImpl());
     }
 
+    // Used for testing
     public AbstractEnvironmentBuilderMojo(EnvironmentManager environmentManager) {
         this.environmentManager = environmentManager;
     }
@@ -33,7 +36,15 @@ public abstract class AbstractEnvironmentBuilderMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        performBuild();
+        if (skip) {
+            getLog().info("Environment build is skipped.");
+        } else {
+            if (environmentManager == null) {
+                environmentManager = new EnvironmentManagerImpl();
+            }
+
+            performBuild();
+        }
     }
 
     protected EnvironmentManager getEnvironmentManager() {
@@ -50,6 +61,10 @@ public abstract class AbstractEnvironmentBuilderMojo extends AbstractMojo {
 
     public void setHost(String host) {
         this.host = host;
+    }
+
+    public void setSkip(boolean skip) {
+        this.skip = skip;
     }
 
     public void setSkipTearDown(boolean skipTearDown) {
