@@ -135,7 +135,7 @@ The build plugin can be configured by passing in the following parameters:
 | env.host         | localhost     | The hostname to build the environment on. |
 | env.docker       | false         | Flag to indicate whether Docker will be used for build environment. |
 | env.skipSetup    | false         | Flag whether to skip setup of build environment. Typically used on developer workstations to speed up builds when environment is fairly static. |
-| env.skipTearDown | false         | Flag whether to skip tear down of build environment. Typically used on developer workstations to speed up builds when environment is fairly static |
+| env.skipTearDown | true          | Flag whether to skip tear down of build environment. Typically used on developer workstations to speed up builds when environment is fairly static |
 
 For example:
 
