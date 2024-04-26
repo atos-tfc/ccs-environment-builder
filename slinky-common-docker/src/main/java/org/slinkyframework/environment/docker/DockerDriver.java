@@ -160,6 +160,7 @@ public class DockerDriver {
         // Create container
         ContainerConfig config = ContainerConfig.builder()
                 .image(imageName)
+                .env("ORACLE_PASSWORD=oracle")
                 .hostConfig(hostConfig)
                 .build();
 
