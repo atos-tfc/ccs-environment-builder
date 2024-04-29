@@ -10,7 +10,7 @@
 
     <groupId>org.slinkyframework.environment</groupId>
     <artifactId>slinky-environment-builder-parent</artifactId>
-    <version>1.0.6-SNAPSHOT</version>
+    <version>1.0.7-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
@@ -59,8 +59,7 @@
     <modules>
         <module>slinky-common-docker</module>
         <module>slinky-environment-builder</module>
-        <module>slinky-environment-builder-couchbase</module>
-        <module>slinky-environment-builder-liquibase</module>
+11        <module>slinky-environment-builder-liquibase</module>
         <module>slinky-environment-builder-maven-plugin</module>
     </modules>
 
