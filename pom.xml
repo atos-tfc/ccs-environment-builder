@@ -10,7 +10,7 @@
 
     <groupId>org.slinkyframework.environment</groupId>
     <artifactId>slinky-environment-builder-parent</artifactId>
-    <version>1.0.6-SNAPSHOT</version>
+    <version>1.0.7-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
