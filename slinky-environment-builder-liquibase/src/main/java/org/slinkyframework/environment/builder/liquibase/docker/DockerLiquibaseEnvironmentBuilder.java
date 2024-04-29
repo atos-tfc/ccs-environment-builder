@@ -21,7 +21,8 @@ import java.util.Set;
 public class DockerLiquibaseEnvironmentBuilder implements EnvironmentBuilder<LiquibaseBuildDefinition>  {
 
     public static final String CONTAINER_NAME = "oracle-xe";
-    public static final String ORACLE_XE_LATEST_IMAGE_NAME = "alexeiled/docker-oracle-xe-11g";
+    //public static final String ORACLE_XE_LATEST_IMAGE_NAME = "alexeiled/docker-oracle-xe-11g";
+    public static final String ORACLE_XE_LATEST_IMAGE_NAME = "docker-pull-tfc.g.sicloud.atos.net/atosorigin/gvenzl/oracle-xe:18-slim";
     public  static final int[] ORACLE_XE_PORTS = { 1521 };
 
     private final LocalLiquibaseEnvironmentBuilder localEnvironmentBuilder;

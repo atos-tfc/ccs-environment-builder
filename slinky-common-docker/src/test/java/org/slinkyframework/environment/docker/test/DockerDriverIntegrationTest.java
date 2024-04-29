@@ -5,9 +5,7 @@ import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerCertificateException;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.messages.Image;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import org.slinkyframework.environment.docker.DockerDriver;
 
 import java.util.HashMap;
@@ -30,61 +28,49 @@ public class DockerDriverIntegrationTest {
 
     private String dockerMachineName = "dev";
 
-    @Before
-    public void setUp() {
-        dockerMachineName = System.getenv(ENVIRONMENT_DOCKER_MACHINE_NAME);
+    private static Map<Integer, Integer> ports;
+    private static DockerDriver testee;
 
+    @BeforeClass
+    public static void createExpensiveResources() {
+        ports = createPortsMap();
+        testee = new DockerDriver(CONTAINER_NAME, IMAGE_NAME, ports);
+    }
+
+    @Before
+    public void setUp()
+    {
+        testee.setUpDocker();
+        dockerMachineName = System.getenv(ENVIRONMENT_DOCKER_MACHINE_NAME);
         if (dockerMachineName == null) {
             dockerMachineName = DEFAULT_DOCKER_MACHINE_NAME;
         }
     }
 
+    @AfterClass
+    public static void teardownAllResources() throws Exception {
+        Optional<Image> image = testee.findImage();
+        removeExistingImage(image);
+    }
+
     @Test
-    public void shouldStartAContainer() {
-        Map<Integer, Integer> ports = createPortsMap();
-        DockerDriver testee = new DockerDriver(CONTAINER_NAME, IMAGE_NAME, ports);
-
-        testee.setUpDocker();
-
+    public void shouldStartAndKillAContainer()
+    {
         assertThat("Container", testee.findExistingContainer().isPresent(), is(true));
         assertThat(dockerMachineName, hasPortAvailable(ports.get(TOMCAT_INTERNAL_PORT)));
-
-    }
-
-    private Map<Integer, Integer> createPortsMap() {
-        Map<Integer, Integer> ports = new HashMap<>();
-        ports.put(TOMCAT_INTERNAL_PORT, selectFreePort());
-
-        return ports;
-    }
-
-    @Test
-    public void shouldKillAndRemoveAContainer() {
-        Map<Integer, Integer> ports = createPortsMap();
-        DockerDriver testee = new DockerDriver(CONTAINER_NAME, IMAGE_NAME, ports);
-
-        testee.setUpDocker();
 
         testee.killAndRemoveContainer();
 
         assertThat("Container", testee.findExistingContainer().isPresent(), is(false));
     }
 
-    @Test
-    @Ignore("Takes a long time to run. So ignoring for main run.")
-    public void shouldPullDownImageIfOneDoesNotExistLocally() throws Exception {
-        Map<Integer, Integer> ports = createPortsMap();
-        DockerDriver testee = new DockerDriver(CONTAINER_NAME, IMAGE_NAME, ports);
-        Optional<Image> image = testee.findImage();
-
-        removeExistingImage(image);
-
-        testee.setUpDocker();
-
-        assertThat("Container found", testee.findExistingContainer().isPresent(), is(true));
+    private static Map<Integer, Integer> createPortsMap() {
+        Map<Integer, Integer> ports = new HashMap<>();
+        ports.put(TOMCAT_INTERNAL_PORT, selectFreePort());
+        return ports;
     }
 
-    private void removeExistingImage(Optional<Image> image) throws DockerException, InterruptedException, DockerCertificateException {
+    private static void removeExistingImage(Optional<Image> image) throws DockerException, InterruptedException, DockerCertificateException {
         DockerClient dockerClient = DefaultDockerClient.fromEnv().build();
 
         if (image.isPresent()) {

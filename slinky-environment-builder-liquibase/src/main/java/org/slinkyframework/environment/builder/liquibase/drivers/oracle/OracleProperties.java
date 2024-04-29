@@ -13,23 +13,23 @@ public class OracleProperties implements DatabaseProperties {
     private String username;
     private String password;
     private int port;
-    private String sid;
+    private String pdb;
     private List<String> users;
     private List<String> tablespaces;
 
-    public OracleProperties(String username, String password, int port, String sid, String user) {
-        this(username, password, port, sid, Arrays.asList(user));
+    public OracleProperties(String username, String password, int port, String pdb, String user) {
+        this(username, password, port, pdb, Arrays.asList(user));
     }
 
-    public OracleProperties(String username, String password, int port, String sid, List<String> users) {
-        this(username, password, port, sid, users, Collections.EMPTY_LIST);
+    public OracleProperties(String username, String password, int port, String pdb, List<String> users) {
+        this(username, password, port, pdb, users, Collections.EMPTY_LIST);
     }
 
-    public OracleProperties(String username, String password, int port, String sid, List<String> users, List<String> tablespaces) {
+    public OracleProperties(String username, String password, int port, String pdb, List<String> users, List<String> tablespaces) {
         this.username = username;
         this.password = password;
         this.port = port;
-        this.sid = sid;
+        this.pdb = pdb;
         this.users = users;
         this.tablespaces = tablespaces;
     }
@@ -51,6 +51,6 @@ public class OracleProperties implements DatabaseProperties {
     }
 
     String getUrl(String hostname) {
-        return format("jdbc:oracle:thin:@%s:%s:%s", hostname, port, sid);
+        return format("jdbc:oracle:thin:@%s:%s/%s", hostname, port, pdb);
     }
 }
