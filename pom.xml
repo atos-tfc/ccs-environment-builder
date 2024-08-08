@@ -59,7 +59,7 @@
     <modules>
         <module>slinky-common-docker</module>
         <module>slinky-environment-builder</module>
-11        <module>slinky-environment-builder-liquibase</module>
+        <module>slinky-environment-builder-liquibase</module>
         <module>slinky-environment-builder-maven-plugin</module>
     </modules>
 
